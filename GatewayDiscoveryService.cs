@@ -16,6 +16,8 @@ public static class GatewayDiscoveryService
 
             while (true)
             {
+            Console.WriteLine("sending discovery request...");
+
                 var data = udp.Receive(ref ep);
                 var msg = Encoding.UTF8.GetString(data);
 

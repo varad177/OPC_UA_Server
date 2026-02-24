@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Varad Dhumale\\Desktop\\data\\OPC_UA_Complete\\OpcUaWebApi\\simulator\\OpcUaSimulator.csproj": {}
+    "C:\\Users\\Varad Dhumale\\Desktop\\data\\opc_us_server\\server\\OpcUaSimulator.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Varad Dhumale\\Desktop\\data\\OPC_UA_Complete\\OpcUaWebApi\\simulator\\OpcUaSimulator.csproj": {
+    "C:\\Users\\Varad Dhumale\\Desktop\\data\\opc_us_server\\server\\OpcUaSimulator.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Varad Dhumale\\Desktop\\data\\OPC_UA_Complete\\OpcUaWebApi\\simulator\\OpcUaSimulator.csproj",
+        "projectUniqueName": "C:\\Users\\Varad Dhumale\\Desktop\\data\\opc_us_server\\server\\OpcUaSimulator.csproj",
         "projectName": "OpcUaSimulator",
-        "projectPath": "C:\\Users\\Varad Dhumale\\Desktop\\data\\OPC_UA_Complete\\OpcUaWebApi\\simulator\\OpcUaSimulator.csproj",
+        "projectPath": "C:\\Users\\Varad Dhumale\\Desktop\\data\\opc_us_server\\server\\OpcUaSimulator.csproj",
         "packagesPath": "C:\\Users\\Varad Dhumale\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Varad Dhumale\\Desktop\\data\\OPC_UA_Complete\\OpcUaWebApi\\simulator\\obj\\",
+        "outputPath": "C:\\Users\\Varad Dhumale\\Desktop\\data\\opc_us_server\\server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

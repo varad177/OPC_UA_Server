@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OpcUaSimulator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+84edba1c8b8bc12539b4e5ccef4b8aa8e71cca92")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8e58dbbcdf0a5361361074b630b3f6a3bcc4a91e")]
 [assembly: System.Reflection.AssemblyProductAttribute("OpcUaSimulator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OpcUaSimulator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

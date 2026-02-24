@@ -41,21 +41,33 @@ public static class GatewayDiscoveryService
         });
     }
 
+
+
     private static string GetWifiIPAddress()
+{
+    foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
     {
-        foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
+        if (ni.OperationalStatus != OperationalStatus.Up)
+            continue;
+
+        // On Linux (Raspberry Pi), WiFi interface name is usually: wlan0
+        // On Windows: Wi-Fi
+        // So we detect by NAME, not by NetworkInterfaceType
+        string name = ni.Name.ToLower();
+
+        if (!name.Contains("wlan") && !name.Contains("wi-fi") && !name.Contains("wifi"))
+            continue;
+
+        foreach (var addr in ni.GetIPProperties().UnicastAddresses)
         {
-            if (ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 &&
-                ni.OperationalStatus == OperationalStatus.Up)
+            if (addr.Address.AddressFamily == AddressFamily.InterNetwork &&
+                !IPAddress.IsLoopback(addr.Address))
             {
-                foreach (var addr in ni.GetIPProperties().UnicastAddresses)
-                {
-                    if (addr.Address.AddressFamily == AddressFamily.InterNetwork)
-                        return addr.Address.ToString();
-                }
+                return addr.Address.ToString();
             }
         }
-
-        return null;
     }
+
+    return null;
+}
 }

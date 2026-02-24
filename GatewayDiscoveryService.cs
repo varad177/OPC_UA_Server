@@ -21,14 +21,16 @@ public static class GatewayDiscoveryService
                 var data = udp.Receive(ref ep);
                 var msg = Encoding.UTF8.GetString(data);
 
-            Console.WriteLine("data received: " + msg);
-            Console.WriteLine("from: " + ep.Address);
+        
                 if (msg == "WHO_IS_GATEWAY?")
                 {
                     string ip = GetWifiIPAddress();
+                    Console.WriteLine($"📩 ip is {ip}");
                     if (ip == null) continue;
 
                     string reply = $"I_AM_GATEWAY:{ip}:{tcpPort}";
+                    Console.WriteLine($"replying to discovery request... {reply}");
+
 
                     byte[] resp = Encoding.UTF8.GetBytes(reply);
                     udp.Send(resp, resp.Length, ep);

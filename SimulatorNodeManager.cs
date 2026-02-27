@@ -80,25 +80,33 @@ public sealed class SimulatorNodeManager : CustomNodeManager2
     }
 
     private async Task HandleClient(TcpClient client)
+{
+    using var stream = client.GetStream();
+    byte[] buffer = new byte[1024];
+    var sb = new StringBuilder();
+
+    while (true)
     {
-        using var stream = client.GetStream();
-        byte[] buffer = new byte[1024];
+        int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+        if (bytesRead == 0) break;
+
+        sb.Append(Encoding.UTF8.GetString(buffer, 0, bytesRead));
 
         while (true)
         {
-            int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-            if (bytesRead == 0) break;
+            int newlineIndex = sb.ToString().IndexOf('\n');
+            if (newlineIndex < 0) break;
 
-            string payload = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+            string line = sb.ToString(0, newlineIndex).Trim();
+            sb.Remove(0, newlineIndex + 1);
 
-            foreach (var line in payload.Split('\n', StringSplitOptions.RemoveEmptyEntries))
-            {
-                ProcessIncomingData(line.Trim());
-            }
+            if (!string.IsNullOrWhiteSpace(line))
+                ProcessIncomingData(line);
         }
-
-        Console.WriteLine("❌ ESP32 Disconnected");
     }
+
+    Console.WriteLine("❌ ESP32 Disconnected");
+}
 
     private void ProcessIncomingData(string json)
 {

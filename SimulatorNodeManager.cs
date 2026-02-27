@@ -9,7 +9,7 @@ public sealed class SimulatorNodeManager : CustomNodeManager2
 {
     private BaseDataVariableState _voltage = null!;
     private BaseDataVariableState _temperature = null!;
-    private BaseDataVariableState _sound = null!;
+    private BaseDataVariableState _heartRate = null!;
 
     private IDictionary<NodeId, IList<IReference>> _externalReferences = null!;
 
@@ -47,10 +47,11 @@ public sealed class SimulatorNodeManager : CustomNodeManager2
             DataTypeIds.Double,
             0.0
         );
-        _sound = CreateVariable(
+
+        _heartRate = CreateVariable(
             machine,
-            "SOUND",
-            "Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=SOUND",
+            "HEART_RATE",
+            "Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=HEART_RATE",
             DataTypeIds.Double,
             0.0
         );
@@ -80,76 +81,76 @@ public sealed class SimulatorNodeManager : CustomNodeManager2
     }
 
     private async Task HandleClient(TcpClient client)
-{
-    using var stream = client.GetStream();
-    byte[] buffer = new byte[1024];
-    var sb = new StringBuilder();
-
-    while (true)
     {
-        int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-        if (bytesRead == 0) break;
-
-        sb.Append(Encoding.UTF8.GetString(buffer, 0, bytesRead));
+        using var stream = client.GetStream();
+        byte[] buffer = new byte[1024];
+        var sb = new StringBuilder();
 
         while (true)
         {
-            int newlineIndex = sb.ToString().IndexOf('\n');
-            if (newlineIndex < 0) break;
+            int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+            if (bytesRead == 0) break;
 
-            string line = sb.ToString(0, newlineIndex).Trim();
-            sb.Remove(0, newlineIndex + 1);
+            sb.Append(Encoding.UTF8.GetString(buffer, 0, bytesRead));
 
-            if (!string.IsNullOrWhiteSpace(line))
-                ProcessIncomingData(line);
+            while (true)
+            {
+                int newlineIndex = sb.ToString().IndexOf('\n');
+                if (newlineIndex < 0) break;
+
+                string line = sb.ToString(0, newlineIndex).Trim();
+                sb.Remove(0, newlineIndex + 1);
+
+                if (!string.IsNullOrWhiteSpace(line))
+                    ProcessIncomingData(line);
+            }
         }
-    }
 
-    Console.WriteLine("❌ ESP32 Disconnected");
-}
+        Console.WriteLine("❌ ESP32 Disconnected");
+    }
 
     private void ProcessIncomingData(string json)
-{
-    try
     {
-        var doc = JsonDocument.Parse(json);
-        var root = doc.RootElement;
+        try
+        {
+            var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
 
-        double voltage = root.GetProperty(
-            "ns=2;s=Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=VOLTAGE"
-        ).GetDouble();
+            double voltage = root.GetProperty(
+                "ns=2;s=Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=VOLTAGE"
+            ).GetDouble();
 
-        double temperature = root.GetProperty(
-            "ns=2;s=Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=TEMP"
-        ).GetDouble();
+            double temperature = root.GetProperty(
+                "ns=2;s=Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=TEMP"
+            ).GetDouble();
 
-        double sound = root.GetProperty(
-            "ns=2;s=Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=SOUND"
-        ).GetDouble();
+            double heartRate = root.GetProperty(
+                "ns=2;s=Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=HEART_RATE"
+            ).GetDouble();
 
-        var now = DateTime.UtcNow;
+            var now = DateTime.UtcNow;
 
-        _voltage.Value = voltage;
-        _temperature.Value = temperature;
-        _sound.Value = sound;
+            _voltage.Value = voltage;
+            _temperature.Value = temperature;
+            _heartRate.Value = heartRate;
 
-        _voltage.Timestamp = now;
-        _temperature.Timestamp = now;
-        _sound.Timestamp = now;
+            _voltage.Timestamp = now;
+            _temperature.Timestamp = now;
+            _heartRate.Timestamp = now;
 
-        _voltage.ClearChangeMasks(SystemContext, false);
-        _temperature.ClearChangeMasks(SystemContext, false);
-        _sound.ClearChangeMasks(SystemContext, false);
+            _voltage.ClearChangeMasks(SystemContext, false);
+            _temperature.ClearChangeMasks(SystemContext, false);
+            _heartRate.ClearChangeMasks(SystemContext, false);
 
-        Console.WriteLine(
-            $"⚡ OPC UA Updated → V={voltage:F2}V | T={temperature:F2}°C | 🔊 Sound={sound:F1}%"
-        );
+            Console.WriteLine(
+                $"⚡ OPC UA Updated → V={voltage:F2}V | T={temperature:F2}°C | ❤️ HR={heartRate:F0} BPM"
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("⚠ TCP Payload Error: " + ex.Message);
+        }
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine("⚠ TCP Payload Error: " + ex.Message);
-    }
-}
 
     // ───────────────── OPC UA HELPERS ─────────────────
 

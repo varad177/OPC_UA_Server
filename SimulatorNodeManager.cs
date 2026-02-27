@@ -9,6 +9,7 @@ public sealed class SimulatorNodeManager : CustomNodeManager2
 {
     private BaseDataVariableState _voltage = null!;
     private BaseDataVariableState _temperature = null!;
+    private BaseDataVariableState _sound = null!;
 
     private IDictionary<NodeId, IList<IReference>> _externalReferences = null!;
 
@@ -43,6 +44,13 @@ public sealed class SimulatorNodeManager : CustomNodeManager2
             machine,
             "TEMP",
             "Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=TEMP",
+            DataTypeIds.Double,
+            0.0
+        );
+        _sound = CreateVariable(
+            machine,
+            "SOUND",
+            "Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=SOUND",
             DataTypeIds.Double,
             0.0
         );
@@ -93,33 +101,47 @@ public sealed class SimulatorNodeManager : CustomNodeManager2
     }
 
     private void ProcessIncomingData(string json)
+{
+    try
     {
-        try
-        {
-            var doc = JsonDocument.Parse(json);
-            var root = doc.RootElement;
+        var doc = JsonDocument.Parse(json);
+        var root = doc.RootElement;
 
-            double voltage = root.GetProperty("ns=2;s=Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=VOLTAGE").GetDouble();
-            double temperature = root.GetProperty("ns=2;s=Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=TEMP").GetDouble();
+        double voltage = root.GetProperty(
+            "ns=2;s=Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=VOLTAGE"
+        ).GetDouble();
 
-            var now = DateTime.UtcNow;
+        double temperature = root.GetProperty(
+            "ns=2;s=Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=TEMP"
+        ).GetDouble();
 
-            _voltage.Value = voltage;
-            _temperature.Value = temperature;
+        double sound = root.GetProperty(
+            "ns=2;s=Plant=MUMBAI_PLANT/Line=ASSEMBLY_01/Machine=CNC_02/Signal=SOUND"
+        ).GetDouble();
 
-            _voltage.Timestamp = now;
-            _temperature.Timestamp = now;
+        var now = DateTime.UtcNow;
 
-            _voltage.ClearChangeMasks(SystemContext, false);
-            _temperature.ClearChangeMasks(SystemContext, false);
+        _voltage.Value = voltage;
+        _temperature.Value = temperature;
+        _sound.Value = sound;
 
-            Console.WriteLine($"⚡ OPC UA Updated → V={voltage:F2}V | T={temperature:F2}°C");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("⚠ TCP Payload Error: " + ex.Message);
-        }
+        _voltage.Timestamp = now;
+        _temperature.Timestamp = now;
+        _sound.Timestamp = now;
+
+        _voltage.ClearChangeMasks(SystemContext, false);
+        _temperature.ClearChangeMasks(SystemContext, false);
+        _sound.ClearChangeMasks(SystemContext, false);
+
+        Console.WriteLine(
+            $"⚡ OPC UA Updated → V={voltage:F2}V | T={temperature:F2}°C | 🔊 Sound={sound:F1}%"
+        );
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine("⚠ TCP Payload Error: " + ex.Message);
+    }
+}
 
     // ───────────────── OPC UA HELPERS ─────────────────
 

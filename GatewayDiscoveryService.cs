@@ -70,4 +70,22 @@ public static class GatewayDiscoveryService
 
     return null;
 }
+
+// private static string GetWifiIPAddress()
+//     {
+//         foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
+//         {
+//             if (ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 &&
+//                 ni.OperationalStatus == OperationalStatus.Up)
+//             {
+//                 foreach (var addr in ni.GetIPProperties().UnicastAddresses)
+//                 {
+//                     if (addr.Address.AddressFamily == AddressFamily.InterNetwork)
+//                         return addr.Address.ToString();
+//                 }
+//             }
+//         }
+
+//         return null;
+//     }
 }
